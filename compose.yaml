@@ -1,0 +1,32 @@
+services:
+  config:
+    image: localhost/sync-config
+    container_name: sync-config
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM registry.cn-hangzhou.aliyuncs.com/jaign-mirror/default:python.3.12
+        WORKDIR /apps
+        ADD . .
+        RUN pip install -r requirements.txt
+    volumes:
+      - config:/etc/sing-box/
+    env_file: .env
+    command: python /apps/main.py
+
+
+  sing-box:
+    image: registry.cn-hangzhou.aliyuncs.com/jaign-mirror/default:sing-box
+    container_name: sing-box
+    restart: always
+    volumes:
+      - config:/etc/sing-box/
+    ports:
+      - "7890:7890"
+    command: -D /var/lib/sing-box -C /etc/sing-box/ run
+    depends_on:
+      config:
+        condition: service_completed_successfully
+
+volumes:
+  config:

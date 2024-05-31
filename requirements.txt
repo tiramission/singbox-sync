@@ -1,0 +1,4 @@
+-i https://mirrors.cloud.tencent.com/pypi/simple
+httpx
+loguru
+tenacity
